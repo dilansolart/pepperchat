@@ -25,7 +25,7 @@ import codecs
 from naoqi import ALProxy
 from oaichat.oaiclient import OaiClient
 
-START_PROMPT = codecs.open(os.getenv('DIALOGUE_START_PROMPTFILE'),encoding='utf-8').read() if os.path.isfile(os.getenv('DIALOGUE_START_PROMPTFILE')) else None
+START_PROMPT = codecs.open(os.getenv('OPENAI_PROMPTFILE'),encoding='utf-8').read() if os.path.isfile(os.getenv('OPENAI_PROMPTFILE')) else None
 participantId = raw_input('Participant ID: ')
 ALIVE = int(participantId) % 2 == 1
 
