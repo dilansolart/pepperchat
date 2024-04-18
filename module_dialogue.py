@@ -18,6 +18,7 @@ ROBOT_IP = "pepper.local" # Pepper default
 
 from optparse import OptionParser
 import re
+from unicodedata import normalize
 import naoqi
 import time
 import sys, os
@@ -65,10 +66,11 @@ class DialogueModule(naoqi.ALModule):
             else:
                 self.aup = ALProxy("ALTextToSpeech",  self.strNaoIp, ROBOT_PORT)
         except RuntimeError:
-            print ("Can't connect to Naoqi at ip \"" + self.strNaoIp + "\" on port " + str(ROBOT_PORT) +".\n"
-               "Please check your script arguments. Run with -h option for help.")
+            print ("Soy GPT, no me puedo conectar con Lied en la IP \"" + self.strNaoIp + "\" en el puerto " + str(ROBOT_PORT) +".\n"
+               "Por favor, comprueba los argumentos de tu script. Ejecútelo con la opción -h para obtener ayuda.")
 
         if START_PROMPT:
+            answer = chatbot.respond(START_PROMPT)
             answer = self.encode(chatbot.respond(START_PROMPT))
             self.aup.say(answer)
         self.listen(True)
@@ -122,9 +124,21 @@ class DialogueModule(naoqi.ALModule):
             self.speechRecognition.pause()
 
     def encode(self,s):
-        s = s.replace(u'å','a').replace(u'ä','a').replace(u'ö','o')
-        s = s.replace(u'Skovde','Schoe the')
-        return codecs.encode(s,'ascii','ignore')
+        print(s)
+        s = s.replace(u'á','a').replace(u'é','e').replace(u'í','i').replace(u'ó','o').replace(u'ú','u').replace(u'ñ','n')
+        # -> NFD y eliminar diacríticos
+        print(s)
+        
+        #metodo 2
+        s = re.sub(r"([^n\u0300-\u036f]|n(?!\u0303(?![\u0300-\u036f])))[\u0300-\u036f]+", r"\1",normalize( "NFD", s), 0, re.I)
+        # # -> NFC
+        s = normalize( 'NFC', s)
+        # return(s)
+        
+        #metodo 3
+        s = codecs.encode(s,'ascii','ignore')
+        return s
+
 
     def processRemote(self, signalName, message):
         self.log.write('INP: ' + message + '\n')
@@ -139,13 +153,13 @@ class DialogueModule(naoqi.ALModule):
         if message=='error':
             self.misunderstandings +=1
             if self.misunderstandings ==1:
-                answer="I didn't understand, can you repeat?"
+                answer="No lo he entendido, ¿puede repetirlo?"
             elif self.misunderstandings == 2:
-                answer="Sorry I didn't get it, can you say it one more time?"
+                answer="Perdona que no lo haya entendido, ¿puedes decirlo una vez más?"
             elif self.misunderstandings == 3:
-                answer="Today I'm having troubles uderstanding what you are saying, I'm sorry"
+                answer="Hoy tengo problemas para entender lo que dices, lo siento."
             else:
-                answer="Please repeat that."
+                answer="Por favor, repite eso."
             print('ERROR, DEFAULT ANSWER:\n'+answer)
         else:
             self.misunderstandings = 0
@@ -216,7 +230,8 @@ def main():
     if ALIVE:
         AutonomousLife.setState('solitary')
         AutonomousLife.stopAll()
-        AutonomousLife.switchFocus('julia-8b4016/behavior_1')
+        AutonomousLife.switchFocus('lieddialog-ca66b6/behavior_1')
+        #AutonomousLife.switchFocus('julia-8b4016/behavior_1') Modificado Dilan lieddialog-ca66b6/behavior_1
         print('Odd participant number, autonomous life enabled.')
     else:
         if AutonomousLife.getState() != 'disabled':

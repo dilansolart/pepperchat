@@ -38,7 +38,7 @@ SAMPLE_RATE = 48000         # Hz, be careful changing this, both google and Naoq
 CALIBRATION_DURATION = 4    # seconds, timespan during which calibration is performed (summing up RMS values and calculating mean)
 CALIBRATION_THRESHOLD_FACTOR = 1.5  # factor the calculated mean RMS gets multiplied by to determine the auto detection threshold (after calibration)
 
-DEFAULT_LANGUAGE = "en-us"  # RFC5646 language tag, e.g. "en-us", "de-de", "fr-fr",... <http://stackoverflow.com/a/14302134>
+DEFAULT_LANGUAGE = "es-ES"  # RFC5646 language tag, e.g. "en-us", "de-de", "fr-fr" "es-CO" español colombia,... <http://stackoverflow.com/a/14302134>
 
 WRITE_WAV_FILE = False      # write the recorded audio to "out.wav" before sending it to google. intended for debugging purposes
 PRINT_RMS = False           # prints the calculated RMS value to the console, useful for setting the threshold
@@ -64,7 +64,7 @@ class SpeechRecognitionModule(naoqi.ALModule):
 
             # declare event to ALMemory so other modules can subscribe
             self.memory = naoqi.ALProxy("ALMemory")
-            self.memory.declareEvent("SpeechRecognition")
+            #self.memory.declareEvent("SpeechRecognition")
 
             # flag to indicate if subscribed to audio events
             self.isStarted = False
