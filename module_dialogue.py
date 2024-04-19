@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 ###########################################################
@@ -124,20 +125,15 @@ class DialogueModule(naoqi.ALModule):
             self.speechRecognition.pause()
 
     def encode(self,s):
-        print(s)
-        s = s.replace(u'á','a').replace(u'é','e').replace(u'í','i').replace(u'ó','o').replace(u'ú','u').replace(u'ñ','n')
-        # -> NFD y eliminar diacríticos
-        print(s)
-        
-        #metodo 2
-        s = re.sub(r"([^n\u0300-\u036f]|n(?!\u0303(?![\u0300-\u036f])))[\u0300-\u036f]+", r"\1",normalize( "NFD", s), 0, re.I)
-        # # -> NFC
-        s = normalize( 'NFC', s)
-        # return(s)
-        
-        #metodo 3
-        s = codecs.encode(s,'ascii','ignore')
-        return s
+        '''Takes a byte string as param and convert it into a unicode one.
+        First tries UTF8, and fallback to Latin1 if it fails'''
+        cr = None
+        try:
+            cr = s.decode('utf8')
+        except UnicodeDecodeError:
+            cr = s.decode('latin1')
+        return cr
+
 
 
     def processRemote(self, signalName, message):
@@ -175,7 +171,7 @@ class DialogueModule(naoqi.ALModule):
     def react(self,s):
         if re.match(".*I.*sit down.*",s): # Sitting down
             self.posture.goToPosture("Sit",1.0)
-        elif re.match(".*I.*stand up.*",s): # Standing up
+        elif re.match(".*Yo.*Levantate.*",s): # Standing up
             self.posture.goToPosture("Stand",1.0)
         elif re.match(".*I.*(lie|lyi).*down.*",s): # Lying down
             self.posture.goToPosture("LyingBack",1.0)
@@ -185,9 +181,6 @@ def main():
     """ Main entry point
 
     """
-
-    
-
 
     parser = OptionParser()
     parser.add_option("--pip",
@@ -232,12 +225,12 @@ def main():
         AutonomousLife.stopAll()
         AutonomousLife.switchFocus('lieddialog-ca66b6/behavior_1')
         #AutonomousLife.switchFocus('julia-8b4016/behavior_1') Modificado Dilan lieddialog-ca66b6/behavior_1
-        print('Odd participant number, autonomous life enabled.')
+        print('Numero de participante impar, vida autonoma activada (autonomous life enabled)')
     else:
         if AutonomousLife.getState() != 'disabled':
             AutonomousLife.setState('disabled')
         RobotPosture.goToPosture('Stand',0.5)
-        print('Even participant number, autonomous life disabled.')
+        print('Numero de participante par, vida autonoma desactivada (autonomous life disabled)')
 
     TabletService = ALProxy('ALTabletService')
     TabletService.goToSleep()

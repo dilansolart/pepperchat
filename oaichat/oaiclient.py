@@ -66,7 +66,9 @@ class OaiClient:
             print('Error resetting dialoge history')
 
 if __name__ == '__main__':
-    client = OaiClient(('Your name is Pepper.','We are currently at the Interaction Lab in Skovde, Sweden.','You are a robot.'))
+    client = OaiClient(('Tu nombre es Lied.',
+                        'Actualmente estamos ubicados en el centro internacional de especialistas en Piedecuesta, Santander.',
+                        'Tu eres un robot social con conocimientos de inteligencia artificial en la salud.'))
     while True:
         s = raw_input('> ')
         if s:
